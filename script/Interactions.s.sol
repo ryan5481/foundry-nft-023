@@ -2,26 +2,63 @@
 
 pragma solidity ^0.8.16;
 
-import {Script} from "forge-std/Script.sol";
-import {JustAnotherPepeJpeg} from "../src/JustAnotherPepeJpeg.sol";
-import {DeployJustAnotherPepeJpeg} from "../script/DeployJustAnotherPepeJpeg.s.sol";
-import {DevOpsTools} from "../lib/foundry-devops/src/DevOpsTools.sol";
+import {stdJson} from "forge-std/StdJson.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {Script, console2} from "forge-std/Script.sol";
+import {BasicNft} from "../src/BasicNft.sol";
 
-contract MintJustAnotherPepeJpeg is Script {
-    string public constant PEPE =
-        "https://ipfs.io/ipfs/QmRmeQ9NRtmjFkMk1RgyJzpuuKaZ8ZsenQZQRp2JaY9Eb2?filename=pepe.json";
+contract MintBasicNft is Script {
+    string private constant TOKEN_URI =
+        "ipfs://bafybeibs7i5rrwz3tzvmjbuutuz2oo5ealwgrqra4k4dtcko6d37p4rcde/?filename=pepe.json";
 
     function run() external {
-        address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment(
-            "MintJustAnotherPepeJpeg",
-            block.chainid
+        address recentlyDeployedBasicNFTContract = getDeployedContractAddress();
+        console2.log(
+            "The returned address is: ",
+            recentlyDeployedBasicNFTContract
         );
-        mintNftOnContract(mostRecentlyDeployed);
+        mintBasicNft(recentlyDeployedBasicNFTContract);
     }
 
-    function mintNftOnContract(address contractAddress) public {
+    function getDeployedContractAddress() private view returns (address) {
+        string memory path = string.concat(
+            vm.projectRoot(),
+            "/broadcast/DeployBasicNft.s.sol/",
+            Strings.toString(block.chainid),
+            "/run-latest.json"
+        );
+        string memory json = vm.readFile(path);
+        bytes memory contractAddress = stdJson.parseRaw(
+            json,
+            ".transactions[0].contractAddress"
+        );
+        return (bytesToAddress(contractAddress));
+    }
+
+    function bytesToAddress(
+        bytes memory bys
+    ) private pure returns (address addr) {
+        assembly {
+            addr := mload(add(bys, 32))
+        }
+    }
+
+    function mintBasicNft(address _basicNFTcontractAddress) public {
         vm.startBroadcast();
-        JustAnotherPepeJpeg(contractAddress).mintNft(PEPE);
+        console2.log(
+            "Minting of the BasicNFT is about to commence on chain: ",
+            block.chainid
+        );
+        console2.log("The passed in tokenURI is: ", TOKEN_URI);
+        console2.log("The passed in address is: ", _basicNFTcontractAddress);
+
+        BasicNft(_basicNFTcontractAddress).mintNft(TOKEN_URI);
+        console2.log("I ran till this point");
         vm.stopBroadcast();
+
+        // uint256 yourNFTId = BasicNft(_basicNFTcontractAddress)
+        //     .getTokenCounter() - 1;
+
+        // console2.log("The Id of your minted BasicNFT token is: ", yourNFTId);
     }
 }
