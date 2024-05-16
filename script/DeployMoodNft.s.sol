@@ -2,22 +2,22 @@
 
 pragma solidity ^0.8.16;
 import {Script, console} from "forge-std/Script.sol";
-import {BlockchainLogoNft} from "../src/BlockchainLogoNft.sol";
+import {MoodNft} from "../src/MoodNft.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
-contract DeployBlockchainLogoNft is Script {
-    function run() external returns (BlockchainLogoNft) {
-        string memory bitcoinSvg = vm.readFile("./img/bitcoin-logo.svg");
-        string memory ethereumSvg = vm.readFile("./img/ethereum-logo.svg");
-        console.log(bitcoinSvg);
+contract DeployMoodNft is Script {
+    function run() external returns (MoodNft) {
+        string memory happySvg = vm.readFile("./img/happy.svg");
+        string memory sadSvg = vm.readFile("./img/sad.svg");
+        console.log(happySvg);
 
         vm.startBroadcast();
-        BlockchainLogoNft blockchainLogoNft = new BlockchainLogoNft(
-            svgToImageURI(bitcoinSvg),
-            svgToImageURI(ethereumSvg)
+        MoodNft moodNft = new MoodNft(
+            svgToImageURI(happySvg),
+            svgToImageURI(sadSvg)
         );
         vm.stopBroadcast();
-        return blockchainLogoNft;
+        return moodNft;
     }
 
     function svgToImageURI(

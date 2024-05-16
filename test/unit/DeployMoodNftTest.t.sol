@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.16;
 import {Test, console} from "forge-std/Test.sol";
-import {BlockchainLogoNft} from "../../src/BlockchainLogoNft.sol";
-import {DeployBlockchainLogoNft} from "../../script/DeployBlockchainLogoNft.s.sol";
+import {MoodNft} from "../../src/MoodNft.sol";
+import {DeployMoodNft} from "../../script/DeployMoodNft.s.sol";
 
-contract DeployBlockchainLogoNftTest is Test {
-    DeployBlockchainLogoNft public deployer;
+contract DeployMoodNftTest is Test {
+    DeployMoodNft public deployer;
 
     function setUp() public {
-        deployer = new DeployBlockchainLogoNft();
+        deployer = new DeployMoodNft();
     }
 
     function testConvertSvgToUri() public view {
